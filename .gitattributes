@@ -1,0 +1,15 @@
+* text=auto eol=lf
+
+# Force LF for files that tooling on Linux is strict about.
+*.go      text eol=lf
+go.mod    text eol=lf
+go.sum    text eol=lf
+*.sh      text eol=lf
+Dockerfile text eol=lf
+Makefile  text eol=lf
+*.yaml    text eol=lf
+*.yml     text eol=lf
+
+# Binary types.
+*.png  binary
+*.jpg  binary

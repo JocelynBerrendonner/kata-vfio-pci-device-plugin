@@ -1,0 +1,80 @@
+# DaemonSet for the kata-vfio-pci-device-plugin.
+#
+# Schedules one plugin pod on every node labelled
+#   kata.io/runtime=installed
+# This is the script-05 / kata-deploy bootstrap label; nodes without
+# Kata installed never run the plugin because vfio-pci passthrough
+# into a runc container is meaningless.
+#
+# The pod mounts:
+#   * /etc/cdi from the host (read-only)        — source of the CDI specs
+#   * /var/lib/kubelet/device-plugins (read-write) — kubelet socket dir
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kata-vfio-system
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: kata-vfio-pci-device-plugin
+  namespace: kata-vfio-system
+  labels:
+    app.kubernetes.io/name: kata-vfio-pci-device-plugin
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: kata-vfio-pci-device-plugin
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: kata-vfio-pci-device-plugin
+    spec:
+      priorityClassName: system-node-critical
+      hostNetwork: true
+      nodeSelector:
+        kata.io/runtime: installed
+      tolerations:
+      - key: CriticalAddonsOnly
+        operator: Exists
+      - key: node-role.kubernetes.io/master
+        effect: NoSchedule
+        operator: Exists
+      - key: node-role.kubernetes.io/control-plane
+        effect: NoSchedule
+        operator: Exists
+      containers:
+      - name: plugin
+        image: ghcr.io/jocelynberrendonner/kata-vfio-pci-device-plugin:latest
+        imagePullPolicy: IfNotPresent
+        args:
+        - --cdi-dir=/etc/cdi
+        - --plugin-dir=/var/lib/kubelet/device-plugins
+        - --resource-prefix=vfio.io
+        - --kind-filter=vfio/*
+        - --v=2
+        securityContext:
+          # Needs to create UNIX sockets in the host-mounted kubelet
+          # plugin dir and read root-owned CDI specs.
+          privileged: false
+          runAsUser: 0
+          capabilities:
+            drop: ["ALL"]
+        volumeMounts:
+        - name: cdi
+          mountPath: /etc/cdi
+          readOnly: true
+        - name: kubelet-plugin-dir
+          mountPath: /var/lib/kubelet/device-plugins
+      volumes:
+      - name: cdi
+        hostPath:
+          path: /etc/cdi
+          type: DirectoryOrCreate
+      - name: kubelet-plugin-dir
+        hostPath:
+          path: /var/lib/kubelet/device-plugins
+          type: Directory
