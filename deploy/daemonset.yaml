@@ -54,7 +54,11 @@ spec:
         - --cdi-dir=/etc/cdi
         - --plugin-dir=/var/lib/kubelet/device-plugins
         - --resource-prefix=vfio.io
-        - --kind-filter=vfio/*
+        # CNCF CDI kinds use "vendor.tld/class", so our specs are
+        # "vfio.io/gpu", "vfio.io/nvswitch", "vfio.io/ib". The filter
+        # must match the dotted vendor; "vfio/*" would silently exclude
+        # everything.
+        - --kind-filter=vfio.io/*
         - --v=2
         securityContext:
           # Needs to create UNIX sockets in the host-mounted kubelet

@@ -44,14 +44,17 @@ bound to `vfio-pci` on the host, described by a CDI spec at
 
 1. The DaemonSet pod mounts the host's `/etc/cdi/` directory.
 2. On startup (and on filesystem change), the plugin reads every
-   CDI spec file and groups devices by CDI kind (e.g. `vfio/gpu`,
-   `vfio/nvswitch`, `vfio/ib`). Each kind becomes one Kubernetes
+   CDI spec file and groups devices by CDI kind (e.g. `vfio.io/gpu`,
+   `vfio.io/nvswitch`, `vfio.io/ib`). Each kind becomes one Kubernetes
    extended resource (mirroring NVIDIA's `k8s-device-plugin`
    per-class pool model):
-   * `vfio/gpu`      &rarr; `vfio.io/gpu`
-   * `vfio/nvswitch` &rarr; `vfio.io/nvswitch`
-   * `vfio/ib`       &rarr; `vfio.io/ib`
-   * generic: `vendor/class` &rarr; `vendor.io/class`
+   * `vfio.io/gpu`      &rarr; `vfio.io/gpu`
+   * `vfio.io/nvswitch` &rarr; `vfio.io/nvswitch`
+   * `vfio.io/ib`       &rarr; `vfio.io/ib`
+   * generic: `vendor.tld/class` &rarr; `vendor.tld/class`
+   (CDI kinds follow the CNCF `vendor.tld/class` convention; the
+   default `--kind-filter=vfio.io/*` exposes every `vfio.io/<class>`
+   spec.)
 3. Each individual device in the spec becomes one allocatable
    instance under that resource.
 4. When kubelet calls `Allocate`, the plugin returns the matching
@@ -93,13 +96,13 @@ spec:
     image: archlinux:latest
     resources:
       limits:
-        vfio.io/gpu:      8  # 8 NVIDIA GPUs from kind=vfio/gpu
-        vfio.io/nvswitch: 6  # 6 NVSwitch bridges from kind=vfio/nvswitch
-        vfio.io/ib:       2  # 2 IB HCAs from kind=vfio/ib
+        vfio.io/gpu:      8  # 8 NVIDIA GPUs from kind=vfio.io/gpu
+        vfio.io/nvswitch: 6  # 6 NVSwitch bridges from kind=vfio.io/nvswitch
+        vfio.io/ib:       2  # 2 IB HCAs from kind=vfio.io/ib
 ```
 
 The plugin picks the requested number of free devices from each pool
-(`vfio/gpu`, `vfio/nvswitch`, `vfio/ib`), returns their CDI names to
+(`vfio.io/gpu`, `vfio.io/nvswitch`, `vfio.io/ib`), returns their CDI names to
 kubelet, and the Kata shim cold-plugs them into the UVM.
 
 ## License

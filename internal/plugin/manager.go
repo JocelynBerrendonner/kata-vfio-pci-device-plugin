@@ -164,15 +164,17 @@ func (m *Manager) stopAll() {
 	}
 }
 
-// resourceName maps a CDI kind ("vendor/class") to the Kubernetes
+// resourceName maps a CDI kind ("vendor.tld/class") to the Kubernetes
 // resource name. If prefix is non-empty, it is used as the resource
-// group; otherwise it is derived from the CDI vendor.
+// group; otherwise it is derived from the CDI vendor (kept as-is when
+// the vendor already contains a dot, otherwise appended with ".io" for
+// historical kinds that pre-dated the CDI vendor.tld convention).
 //
 // Examples:
 //
-//	prefix="vfio.io", kind="vfio/gpu"  -> "vfio.io/gpu"
-//	prefix="vfio.io", kind="vfio/ib"   -> "vfio.io/ib"
-//	prefix="",        kind="acme/widget" -> "acme.io/widget"
+//	prefix="vfio.io", kind="vfio.io/gpu"  -> "vfio.io/gpu"
+//	prefix="vfio.io", kind="vfio.io/ib"   -> "vfio.io/ib"
+//	prefix="",        kind="acme.io/widget" -> "acme.io/widget"
 func resourceName(prefix, kind string) string {
 	slash := strings.IndexByte(kind, '/')
 	if slash < 0 {

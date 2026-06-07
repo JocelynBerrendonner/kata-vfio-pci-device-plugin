@@ -25,12 +25,15 @@ func main() {
 		"Kubelet device-plugin socket directory.")
 	resourcePrefix := flag.String("resource-prefix", "vfio.io",
 		"Kubernetes resource group used for advertised resources. "+
-			"Each CDI kind 'vendor/class' becomes '<prefix>/class'. "+
+			"Each CDI kind 'vendor.tld/class' becomes '<prefix>/class'. "+
 			"Set empty to derive the prefix from the CDI kind's vendor "+
-			"(e.g. 'vfio/gpu' -> 'vfio.io/gpu').")
-	kindFilter := flag.String("kind-filter", "vfio/*",
+			"(e.g. 'vfio.io/gpu' -> 'vfio.io/gpu').")
+	kindFilter := flag.String("kind-filter", "vfio.io/*",
 		"Glob filter (comma-separated) over CDI kinds to expose. "+
-			"Default exposes any kind under the 'vfio' vendor.")
+			"Default exposes any kind under the 'vfio.io' CNCF CDI "+
+			"vendor (e.g. 'vfio.io/gpu', 'vfio.io/nvswitch', "+
+			"'vfio.io/ib'). Use '*' to expose every kind in the "+
+			"CDI directory.")
 
 	flag.Parse()
 
