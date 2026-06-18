@@ -53,12 +53,17 @@ spec:
         args:
         - --cdi-dir=/etc/cdi
         - --plugin-dir=/var/lib/kubelet/device-plugins
-        - --resource-prefix=vfio.io
-        # CNCF CDI kinds use "vendor.tld/class", so our specs are
-        # "vfio.io/gpu", "vfio.io/nvswitch", "vfio.io/ib". The filter
-        # must match the dotted vendor; "vfio/*" would silently exclude
-        # everything.
-        - --kind-filter=vfio.io/*
+        # Empty prefix -> each CDI kind is exposed verbatim as the
+        # Kubernetes resource name. This lets NVIDIA-flavoured kinds
+        # ("nvidia.com/gpu", "nvidia.com/nvswitch") and the legacy
+        # vfio.io-flavoured kind for IB ("vfio.io/ib") coexist with
+        # their canonical names, which matches what pod authors and
+        # the NVIDIA k8s-device-plugin already use.
+        - --resource-prefix=
+        # CNCF CDI kinds use "vendor.tld/class". We accept the NVIDIA
+        # vendor for GPUs / NVSwitches and the vfio.io vendor for IB.
+        # "vfio/*" (no dot) would silently exclude everything.
+        - --kind-filter=vfio.io/*,nvidia.com/*
         - --v=2
         securityContext:
           # Needs to create UNIX sockets in the host-mounted kubelet

@@ -30,7 +30,7 @@ type Manager struct {
 	cfg Config
 
 	mu      sync.Mutex
-	servers map[string]*Server // keyed by resource name (e.g. "vfio.io/gpu")
+	servers map[string]*Server // keyed by resource name (e.g. "nvidia.com/gpu")
 }
 
 // NewManager constructs a Manager. It does not start anything yet.
@@ -166,15 +166,19 @@ func (m *Manager) stopAll() {
 
 // resourceName maps a CDI kind ("vendor.tld/class") to the Kubernetes
 // resource name. If prefix is non-empty, it is used as the resource
-// group; otherwise it is derived from the CDI vendor (kept as-is when
-// the vendor already contains a dot, otherwise appended with ".io" for
-// historical kinds that pre-dated the CDI vendor.tld convention).
+// group (so every CDI kind is collapsed under that single prefix);
+// otherwise the CDI kind is exposed verbatim as the resource name when
+// its vendor already contains a dot (the CDI vendor.tld convention),
+// or has ".io" appended for legacy vendors that pre-dated the
+// convention.
 //
 // Examples:
 //
-//	prefix="vfio.io", kind="vfio.io/gpu"  -> "vfio.io/gpu"
-//	prefix="vfio.io", kind="vfio.io/ib"   -> "vfio.io/ib"
-//	prefix="",        kind="acme.io/widget" -> "acme.io/widget"
+//	prefix="vfio.io", kind="vfio.io/gpu"      -> "vfio.io/gpu"
+//	prefix="vfio.io", kind="nvidia.com/gpu"   -> "vfio.io/gpu"
+//	prefix="",        kind="vfio.io/ib"       -> "vfio.io/ib"
+//	prefix="",        kind="nvidia.com/gpu"   -> "nvidia.com/gpu"
+//	prefix="",        kind="acme/widget"      -> "acme.io/widget"
 func resourceName(prefix, kind string) string {
 	slash := strings.IndexByte(kind, '/')
 	if slash < 0 {
@@ -186,7 +190,10 @@ func resourceName(prefix, kind string) string {
 	}
 	vendor, class := kind[:slash], kind[slash+1:]
 	if prefix == "" {
-		prefix = vendor + ".io"
+		if strings.ContainsRune(vendor, '.') {
+			return vendor + "/" + class
+		}
+		return vendor + ".io/" + class
 	}
 	return prefix + "/" + class
 }

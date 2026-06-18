@@ -23,17 +23,19 @@ func main() {
 		"Directory containing CDI spec YAML files to expose.")
 	pluginDir := flag.String("plugin-dir", "/var/lib/kubelet/device-plugins",
 		"Kubelet device-plugin socket directory.")
-	resourcePrefix := flag.String("resource-prefix", "vfio.io",
+	resourcePrefix := flag.String("resource-prefix", "",
 		"Kubernetes resource group used for advertised resources. "+
-			"Each CDI kind 'vendor.tld/class' becomes '<prefix>/class'. "+
-			"Set empty to derive the prefix from the CDI kind's vendor "+
-			"(e.g. 'vfio.io/gpu' -> 'vfio.io/gpu').")
-	kindFilter := flag.String("kind-filter", "vfio.io/*",
+			"When non-empty, every CDI kind 'vendor.tld/class' is exposed "+
+			"as '<prefix>/class' (collapsing all vendors under one prefix). "+
+			"When empty (the default) each CDI kind is exposed verbatim as "+
+			"the resource name (e.g. 'nvidia.com/gpu' -> 'nvidia.com/gpu', "+
+			"'vfio.io/ib' -> 'vfio.io/ib').")
+	kindFilter := flag.String("kind-filter", "vfio.io/*,nvidia.com/*",
 		"Glob filter (comma-separated) over CDI kinds to expose. "+
-			"Default exposes any kind under the 'vfio.io' CNCF CDI "+
-			"vendor (e.g. 'vfio.io/gpu', 'vfio.io/nvswitch', "+
-			"'vfio.io/ib'). Use '*' to expose every kind in the "+
-			"CDI directory.")
+			"Default exposes both the 'vfio.io' CNCF CDI vendor (e.g. "+
+			"'vfio.io/ib') and the 'nvidia.com' vendor (e.g. "+
+			"'nvidia.com/gpu', 'nvidia.com/nvswitch'). Use '*' to expose "+
+			"every kind in the CDI directory.")
 
 	flag.Parse()
 

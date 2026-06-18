@@ -16,12 +16,12 @@ import (
 
 // Device represents a single addressable CDI device.
 type Device struct {
-	// Kind is the CDI kind ("vendor.tld/class"), e.g. "vfio.io/gpu".
+	// Kind is the CDI kind ("vendor.tld/class"), e.g. "nvidia.com/gpu".
 	Kind string
 	// Name is the device name within the spec, e.g. "gpu0".
 	Name string
 	// FullID is the canonical CDI identifier used in CDIDevice.Name,
-	// e.g. "vfio.io/gpu=gpu0".
+	// e.g. "nvidia.com/gpu=0".
 	FullID string
 }
 
