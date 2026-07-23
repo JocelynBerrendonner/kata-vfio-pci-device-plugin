@@ -28,13 +28,13 @@ func main() {
 			"When non-empty, every CDI kind 'vendor.tld/class' is exposed "+
 			"as '<prefix>/class' (collapsing all vendors under one prefix). "+
 			"When empty (the default) each CDI kind is exposed verbatim as "+
-			"the resource name (e.g. 'nvidia.com/gpu' -> 'nvidia.com/gpu', "+
+			"the resource name (e.g. 'nvidia.com/pgpu' -> 'nvidia.com/pgpu', "+
 			"'vfio.io/ib' -> 'vfio.io/ib').")
 	kindFilter := flag.String("kind-filter", "vfio.io/*,nvidia.com/*",
 		"Glob filter (comma-separated) over CDI kinds to expose. "+
 			"Default exposes both the 'vfio.io' CNCF CDI vendor (e.g. "+
 			"'vfio.io/ib') and the 'nvidia.com' vendor (e.g. "+
-			"'nvidia.com/gpu', 'nvidia.com/nvswitch'). Use '*' to expose "+
+			"'nvidia.com/pgpu', 'nvidia.com/nvswitch'). Use '*' to expose "+
 			"every kind in the CDI directory.")
 
 	flag.Parse()

@@ -55,7 +55,7 @@ spec:
         - --plugin-dir=/var/lib/kubelet/device-plugins
         # Empty prefix -> each CDI kind is exposed verbatim as the
         # Kubernetes resource name. This lets NVIDIA-flavoured kinds
-        # ("nvidia.com/gpu", "nvidia.com/nvswitch") and the legacy
+        # ("nvidia.com/pgpu", "nvidia.com/nvswitch") and the legacy
         # vfio.io-flavoured kind for IB ("vfio.io/ib") coexist with
         # their canonical names, which matches what pod authors and
         # the NVIDIA k8s-device-plugin already use.

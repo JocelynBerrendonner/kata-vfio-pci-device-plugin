@@ -6,7 +6,7 @@ PCI devices as allocatable resources and hands them to containers as
 
 It is **Kata-aware** in two senses:
 
-* The resources it exposes (`nvidia.com/gpu`, `nvidia.com/nvswitch`,
+* The resources it exposes (`nvidia.com/pgpu`, `nvidia.com/nvswitch`,
   `vfio.io/ib`, ...) are only
   useful when the consuming pod runs under a VM-isolating runtime such
   as Kata Containers. The plugin DaemonSet is therefore scheduled only
@@ -44,12 +44,12 @@ bound to `vfio-pci` on the host, described by a CDI spec at
 
 1. The DaemonSet pod mounts the host's `/etc/cdi/` directory.
 2. On startup (and on filesystem change), the plugin reads every
-   CDI spec file and groups devices by CDI kind (e.g. `nvidia.com/gpu`,
+   CDI spec file and groups devices by CDI kind (e.g. `nvidia.com/pgpu`,
    `nvidia.com/nvswitch`, `vfio.io/ib`). Each kind becomes one Kubernetes
    extended resource (mirroring NVIDIA's `k8s-device-plugin`
    per-class pool model). With the default empty `--resource-prefix`,
    each CDI kind is exposed verbatim:
-   * `nvidia.com/gpu`      &rarr; `nvidia.com/gpu`
+   * `nvidia.com/pgpu`     &rarr; `nvidia.com/pgpu`
    * `nvidia.com/nvswitch` &rarr; `nvidia.com/nvswitch`
    * `vfio.io/ib`          &rarr; `vfio.io/ib`
    * generic: `vendor.tld/class` &rarr; `vendor.tld/class`
@@ -97,13 +97,13 @@ spec:
     image: archlinux:latest
     resources:
       limits:
-        nvidia.com/gpu:      8  # 8 NVIDIA GPUs from kind=nvidia.com/gpu
+        nvidia.com/pgpu:     8  # 8 NVIDIA GPUs from kind=nvidia.com/pgpu
         nvidia.com/nvswitch: 6  # 6 NVSwitch bridges from kind=nvidia.com/nvswitch
         vfio.io/ib:          2  # 2 IB HCAs from kind=vfio.io/ib
 ```
 
 The plugin picks the requested number of free devices from each pool
-(`nvidia.com/gpu`, `nvidia.com/nvswitch`, `vfio.io/ib`), returns their CDI
+(`nvidia.com/pgpu`, `nvidia.com/nvswitch`, `vfio.io/ib`), returns their CDI
 names to kubelet, and the Kata shim cold-plugs them into the UVM.
 
 ## License

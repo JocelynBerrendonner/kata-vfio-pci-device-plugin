@@ -30,7 +30,7 @@ type Manager struct {
 	cfg Config
 
 	mu      sync.Mutex
-	servers map[string]*Server // keyed by resource name (e.g. "nvidia.com/gpu")
+	servers map[string]*Server // keyed by resource name (e.g. "nvidia.com/pgpu")
 }
 
 // NewManager constructs a Manager. It does not start anything yet.
@@ -175,9 +175,9 @@ func (m *Manager) stopAll() {
 // Examples:
 //
 //	prefix="vfio.io", kind="vfio.io/gpu"      -> "vfio.io/gpu"
-//	prefix="vfio.io", kind="nvidia.com/gpu"   -> "vfio.io/gpu"
+//	prefix="vfio.io", kind="nvidia.com/pgpu"  -> "vfio.io/pgpu"
 //	prefix="",        kind="vfio.io/ib"       -> "vfio.io/ib"
-//	prefix="",        kind="nvidia.com/gpu"   -> "nvidia.com/gpu"
+//	prefix="",        kind="nvidia.com/pgpu"  -> "nvidia.com/pgpu"
 //	prefix="",        kind="acme/widget"      -> "acme.io/widget"
 func resourceName(prefix, kind string) string {
 	slash := strings.IndexByte(kind, '/')

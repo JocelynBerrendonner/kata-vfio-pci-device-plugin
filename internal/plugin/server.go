@@ -23,7 +23,7 @@ const kubeletSocket = "kubelet.sock"
 
 // ServerConfig is the per-resource configuration.
 type ServerConfig struct {
-	ResourceName string // e.g. "nvidia.com/gpu"
+	ResourceName string // e.g. "nvidia.com/pgpu"
 	PluginDir    string // e.g. "/var/lib/kubelet/device-plugins"
 	SocketName   string // e.g. "kata-vfio-vfio_io_pci.sock"
 }
